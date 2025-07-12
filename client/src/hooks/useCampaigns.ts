@@ -51,6 +51,6 @@ export function useCampaignStats() {
     activeUsers: number;
     gasFeeSaved: string;
   }>({
-    queryKey: ["/api/campaigns/stats"],
+    queryKey: ["/api/stats"],
   });
 }

@@ -58,7 +58,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get campaign statistics
-  app.get("/api/campaigns/stats", async (req, res) => {
+  app.get("/api/stats", async (req, res) => {
     try {
       const stats = await storage.getCampaignStats();
       res.json(stats);

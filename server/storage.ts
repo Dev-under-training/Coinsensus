@@ -134,6 +134,8 @@ export class MemStorage implements IStorage {
     const vote: Vote = {
       id: this.currentVoteId++,
       ...voteData,
+      weight: voteData.weight ?? 1,
+      transactionHash: voteData.transactionHash ?? null,
       createdAt: new Date(),
     };
     this.votes.set(vote.id, vote);
@@ -173,6 +175,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       id: this.currentUserId++,
       ...userData,
+      displayName: userData.displayName ?? null,
       isVerified: false,
       createdAt: new Date(),
     };
