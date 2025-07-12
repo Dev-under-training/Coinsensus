@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Badge } from "@/components/ui/badge";
-import { Users, Clock, Building, GraduationCap, Leaf } from "lucide-react";
+import { Users, Clock, Building, GraduationCap, Leaf, Shield } from "lucide-react";
 import { useWallet } from "@/hooks/useWallet";
 import { useVote } from "@/hooks/useCampaigns";
 import { web3Service } from "@/lib/web3";
 import { useToast } from "@/hooks/use-toast";
+import { sybilProtectionService } from "@/lib/sybil-protection";
 
 interface CampaignCardProps {
   campaign: Campaign;
@@ -56,6 +57,29 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
     }
 
     try {
+      // Check Sybil protection rules
+      const sybilCheck = await sybilProtectionService.canVote(address, campaign.id);
+      
+      if (!sybilCheck.canVote) {
+        toast({
+          title: "Voting restricted",
+          description: sybilCheck.reasons.join(". "),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check for suspicious activity
+      const suspiciousActivity = sybilProtectionService.detectSuspiciousActivity(address);
+      if (suspiciousActivity.isSuspicious) {
+        toast({
+          title: "Suspicious activity detected",
+          description: suspiciousActivity.reasons.join(". ") + " Please try again later.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Cast vote on blockchain
       const txHash = await web3Service.vote(campaign.id, optionIndex);
       
@@ -65,6 +89,9 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
         choice: (campaign.options as string[])[optionIndex],
         transactionHash: txHash,
       });
+
+      // Record vote in Sybil protection service
+      await sybilProtectionService.recordVote(address, campaign.id);
 
       toast({
         title: "Vote cast successfully!",
