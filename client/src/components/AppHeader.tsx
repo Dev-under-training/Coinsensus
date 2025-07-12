@@ -34,6 +34,9 @@ export function AppHeader() {
             <Link href="/security" className={`transition-colors ${location === '/security' ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
               Security
             </Link>
+            <Link href="/advanced" className={`transition-colors ${location === '/advanced' ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}>
+              Advanced
+            </Link>
           </nav>
 
           {/* Network Status and Wallet */}
